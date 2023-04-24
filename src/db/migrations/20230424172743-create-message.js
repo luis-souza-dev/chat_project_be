@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.createTable('Messages', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
@@ -23,6 +23,18 @@ module.exports = {
       },
       isRead: {
         type: Sequelize.BOOLEAN
+      },
+      senderId: {
+        allowNull: true,
+        autoIncrement: false,
+        primaryKey: false,
+        type: Sequelize.UUID
+      },
+      receiverId: {
+        allowNull: true,
+        autoIncrement: false,
+        primaryKey: false,
+        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,

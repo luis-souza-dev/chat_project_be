@@ -11,11 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Message.belongsTo(models.User, {
+        foreignKey: 'senderId'
+      });
+
+      Message.belongsTo(models.User, {
+        foreignKey: 'receiverId'
+      });
     }
   }
   Message.init({
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.UUIDV4,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
@@ -25,7 +32,21 @@ module.exports = (sequelize, DataTypes) => {
     date: DataTypes.DATE,
     hasBeenEdited: DataTypes.BOOLEAN,
     isFromGroup: DataTypes.BOOLEAN,
-    isRead: DataTypes.BOOLEAN
+    isRead: DataTypes.BOOLEAN,
+    senderId: {
+      type: DataTypes.UUIDV4,
+      primaryKey: false,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: true,
+      autoIncrement: false,
+    },
+    receiverId: {
+      type: DataTypes.UUIDV4,
+      primaryKey: false,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: true,
+      autoIncrement: false,
+    },
   }, {
     sequelize,
     modelName: 'Message',
