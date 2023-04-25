@@ -1,19 +1,25 @@
-const { User, AccessToken } = require('../db/models');
 const jsonwebtoken = require('jsonwebtoken');
-const { jwt_secret } = require('../config');
+const bcrypt = require('bcrypt');
+
+const { User, AccessToken } = require('../../db/models');
+const { jwt_secret } = require('../../config');
 
 module.exports = {
 
     login: async (req, res) => {
-        if (!req.body.email) res.status(500).send('no email provided');
-        if (!req.body.pwd) res.status(500).send('no pwd provided');
+        if (!req.body.email) return res.status(500).send('no email provided');
+        if (!req.body.pwd) return res.status(500).send('no pwd provided');
 
         const user = await User.findOne({
             where: {
                 email: req.body.email,
-                pwd: req.body.pwd,
             }
         });
+
+        const isValid = bcrypt.compareSync(req.body.pwd, user.pwd);
+
+        if (!isValid) 
+            return res.status(500).send('Invalid Password');
         
         let token = jsonwebtoken.sign({
             userId: user.id,
@@ -26,6 +32,6 @@ module.exports = {
 
         await token.setUsers(user.id);
 
-        res.send(token);
+        res.status(200).send(token);
     }
 }

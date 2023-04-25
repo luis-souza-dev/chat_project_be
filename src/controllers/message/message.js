@@ -1,4 +1,4 @@
-const { User, Group, Message } = require('../db/models');
+const { User, Group, Message } = require('../../db/models');
 
 module.exports = {
 
