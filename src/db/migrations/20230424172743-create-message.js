@@ -24,18 +24,6 @@ module.exports = {
       isRead: {
         type: Sequelize.BOOLEAN
       },
-      senderId: {
-        allowNull: true,
-        autoIncrement: false,
-        primaryKey: false,
-        type: Sequelize.UUID
-      },
-      receiverId: {
-        allowNull: true,
-        autoIncrement: false,
-        primaryKey: false,
-        type: Sequelize.UUID
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

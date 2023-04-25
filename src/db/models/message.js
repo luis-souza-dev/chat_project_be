@@ -12,10 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Message.belongsTo(models.User, {
-        foreignKey: 'senderId'
+        as: 'sender',
+        foreignKey: 'senderId',
       });
 
       Message.belongsTo(models.User, {
+        as: 'receiver',
         foreignKey: 'receiverId'
       });
     }
@@ -33,20 +35,6 @@ module.exports = (sequelize, DataTypes) => {
     hasBeenEdited: DataTypes.BOOLEAN,
     isFromGroup: DataTypes.BOOLEAN,
     isRead: DataTypes.BOOLEAN,
-    senderId: {
-      type: DataTypes.UUIDV4,
-      primaryKey: false,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: true,
-      autoIncrement: false,
-    },
-    receiverId: {
-      type: DataTypes.UUIDV4,
-      primaryKey: false,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: true,
-      autoIncrement: false,
-    },
   }, {
     sequelize,
     modelName: 'Message',

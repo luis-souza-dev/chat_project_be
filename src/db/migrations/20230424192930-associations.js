@@ -10,7 +10,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
       // Order belongsTo Customer
-      return queryInterface.addColumn(
+      await queryInterface.addColumn(
         'Messages', // name of Source model
         'senderId', // name of the key we're adding 
         {
@@ -22,10 +22,8 @@ module.exports = {
           onUpdate: 'CASCADE',
           onDelete: 'SET NULL',
         }
-      )
-      .then(() => {
-        // Payment hasOne Order
-        return queryInterface.addColumn(
+      );
+      await queryInterface.addColumn(
           'Messages', // name of Target model
           'receiverId', // name of the key we're adding
           {
@@ -37,8 +35,7 @@ module.exports = {
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
           }
-        );
-      })
+      );
   },
 
   async down (queryInterface, Sequelize) {

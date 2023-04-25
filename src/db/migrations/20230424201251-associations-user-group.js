@@ -21,11 +21,11 @@ module.exports = {
           allowNull: false,
           type: Sequelize.DATE,
         },
-        userId: {
+        UserId: {
           type: Sequelize.UUID,
           primaryKey: true,
         },
-        groupId: {
+        GroupId: {
           type: Sequelize.UUID,
           primaryKey: true,
         },
