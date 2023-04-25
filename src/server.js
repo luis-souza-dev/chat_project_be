@@ -1,8 +1,9 @@
 const express = require("express");
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const helmet = require('helmet');
 
-const model = require('./db/models');
-
-const { User } = model;
+const router = require('./routes');
 // this example uses express web framework so we know what longer build times
 // do and how Dockerfile layer ordering matters. If you mess up Dockerfile ordering
 // you'll see long build times on every code change + build. If done correctly,
@@ -12,22 +13,14 @@ const morgan = require("morgan");
 // morgan provides easy logging for express, and by default it logs to stdout
 // which is a best practice in Docker. Friends don't let friends code their apps to
 // do app logging to files in containers.
-
 // Appi
 const app = express();
 
 app.use(morgan("common"));
-
-app.get('/', function(req,res) {
-    User.count().then((data) => console.log('data', data));
-    res.send('aa');
-})
-
-app.get("/healthz", function(req, res) {
-  // do app logic here to determine if app is truly healthy
-  // you should return 200 if healthy, and anything else will fail
-  // if you want, you should be able to restrict this to localhost (include ipv4 and ipv6)
-  res.send("I am happy and healthy\n");
-});
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+app.use(helmet());
+app.use(router);
 
 module.exports = app;

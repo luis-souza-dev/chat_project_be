@@ -3,18 +3,18 @@ const { port } = require("./config");
 const sequelize = require("./db");
 
 
-sequelize.sync();
-
-(async () => {
-try {
-    await sequelize.authenticate();
-    console.log("Database connection setup successfully!");
-} catch (error) {
-    console.log("Unable to connect to the database", error);
-}
-})();
 const server = app.listen(port, function() {
   console.log("Webserver is ready");
+  sequelize.sync();
+
+    (async () => {
+    try {
+        await sequelize.authenticate();
+        console.log("Database connection setup successfully!");
+    } catch (error) {
+        console.log("Unable to connect to the database", error);
+    }
+    })();
 });
 
 //
