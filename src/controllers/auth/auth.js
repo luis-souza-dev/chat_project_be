@@ -1,7 +1,7 @@
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const { User, AccessToken } = require('../../db/models');
+const { User, RefreshToken } = require('../../db/models');
 const { jwt_secret } = require('../../config');
 
 module.exports = {
@@ -16,6 +16,8 @@ module.exports = {
             }
         });
 
+        if (!user) return res.status(500).send('Invalid email');
+
         const isValid = bcrypt.compareSync(req.body.pwd, user.pwd);
 
         if (!isValid) 
@@ -26,12 +28,12 @@ module.exports = {
             userEmail: user.email
         }, jwt_secret, { expiresIn: '30m' });
 
-        token = await AccessToken.create({
+        token = await RefreshToken.create({
             token,
         });
 
         await token.setUsers(user.id);
 
-        res.status(200).send(token);
+        res.status(200).send(token.token);
     }
 }
