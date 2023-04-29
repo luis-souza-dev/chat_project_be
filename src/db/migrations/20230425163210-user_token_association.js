@@ -9,25 +9,30 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-      return queryInterface.createTable(
-        'UsersTokens',
+      await queryInterface.addColumn(
+        'Users', // name of Source model
+        'RefreshTokenId', // name of the key we're adding 
         {
-          createdAt: {
-            allowNull: false,
-            type: Sequelize.DATE,
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'RefreshTokens', // name of Target model
+            key: 'id', // key in Target model that we're referencing
           },
-          updatedAt: {
-            allowNull: false,
-            type: Sequelize.DATE,
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
+        }
+      );
+      await queryInterface.addColumn(
+        'RefreshTokens', // name of Source model
+        'UserId', // name of the key we're adding 
+        {
+          type: Sequelize.UUID,
+          references: {
+            model: 'Users', // name of Target model
+            key: 'id', // key in Target model that we're referencing
           },
-          UserId: {
-            type: Sequelize.UUID,
-            primaryKey: true,
-          },
-          AccessTokenId: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',
         }
       );
   },
@@ -39,5 +44,8 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+
+      await queryInterface.removeColumn('Users', 'TokenId');
+      await queryInterface.removeColumn('RefreshTokens', 'UserId');
   }
 };

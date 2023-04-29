@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.belongsToMany(models.Group, { through: 'UsersGroups' });
-      User.belongsToMany(models.AccessToken, { through: 'UsersTokens' });
+      User.hasOne(models.RefreshToken);
     }
   }
 
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     pwd: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'User',
