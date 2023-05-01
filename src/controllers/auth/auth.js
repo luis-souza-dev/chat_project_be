@@ -22,15 +22,16 @@ module.exports = {
 
         if (!isValid) 
             return res.status(500).send('Invalid Password');
-        
+        console.log('a', jwt_secret);
+        console.log('b', process.env.JWT_SECRET);
         let accessToken = jwt.sign({
             userId: user.id,
             userEmail: user.email
-        }, jwt_secret, { expiresIn: '10s' });
+        }, process.env.JWT_SECRET, { expiresIn: '30m' });
 
         let refreshToken = jwt.sign({
             userId: user.id,
-        }, jwt_secret, { expiresIn: '1d' });
+        }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         const _refreshToken = await user.getRefreshToken();
         if (!_refreshToken) {
@@ -38,7 +39,7 @@ module.exports = {
                 token: refreshToken
             });
             await token.setUser(user);
-            await user.setRefreshToken(tok);
+            await user.setRefreshToken(token);
         }
 
         res.status(200).send({
@@ -48,24 +49,22 @@ module.exports = {
     },
 
     refresh: async (req, res) => {
+        console.log('a', req.body);
         if(!req.body.token) return res.status(500).send('Missing token');
         const token = jwt.verify(req.body.token, jwt_secret,   function (err, payload) {
             if (err) return false;
             else return payload
         });
         if(!token) return res.status(500).send('Invalid Token');
-
         const user = await User.findOne({
             where: {
                 id: token.userId,
             }
         });
-
+        console.log('a, user', user)
         if (!user) return res.status(500).send('User not found');
         
         const userRefreshToken = await user.getRefreshToken();
-        console.log('a', req.body.token)
-        console.log('b', userRefreshToken.token)
         if (req.body.token !== userRefreshToken.token) return res.status(401).send('Token missmatch');
 
         const error = jwt.verify(userRefreshToken.token, jwt_secret, (err) => {
@@ -91,7 +90,5 @@ module.exports = {
                 refreshToken
             })
         }
-
-        return res.status(500).send('something went wrong');
     }
 }
