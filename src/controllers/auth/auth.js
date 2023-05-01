@@ -1,4 +1,4 @@
-const jsonwebtoken = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const { User, RefreshToken } = require('../../db/models');
@@ -23,27 +23,22 @@ module.exports = {
         if (!isValid) 
             return res.status(500).send('Invalid Password');
         
-        let accessToken = jsonwebtoken.sign({
+        let accessToken = jwt.sign({
             userId: user.id,
             userEmail: user.email
-        }, jwt_secret, { expiresIn: '30m' });
+        }, jwt_secret, { expiresIn: '10s' });
 
-        let refreshToken = jsonwebtoken.sign({
+        let refreshToken = jwt.sign({
             userId: user.id,
         }, jwt_secret, { expiresIn: '1d' });
 
         const _refreshToken = await user.getRefreshToken();
         if (!_refreshToken) {
-            const tok = await RefreshToken.create({
+            const token = await RefreshToken.create({
                 token: refreshToken
             });
-
-            await tok.setUser(user);
-            console.log('a', user);
+            await token.setUser(user);
             await user.setRefreshToken(tok);
-            // await user.createRefreshToken({
-            //     token: refreshToken
-            // });
         }
 
         res.status(200).send({
@@ -53,16 +48,25 @@ module.exports = {
     },
 
     refresh: async (req, res) => {
+        if(!req.body.token) return res.status(500).send('Missing token');
+        const token = jwt.verify(req.body.token, jwt_secret,   function (err, payload) {
+            if (err) return false;
+            else return payload
+        });
+        if(!token) return res.status(500).send('Invalid Token');
+
         const user = await User.findOne({
             where: {
-                id: req.body.id,
+                id: token.userId,
             }
         });
 
         if (!user) return res.status(500).send('User not found');
         
-        const userRefreshToken = user.getToken();
-        if (req.body.token !== userRefreshToken.token) return res.status(401).send('Invalid Token');
+        const userRefreshToken = await user.getRefreshToken();
+        console.log('a', req.body.token)
+        console.log('b', userRefreshToken.token)
+        if (req.body.token !== userRefreshToken.token) return res.status(401).send('Token missmatch');
 
         const error = jwt.verify(userRefreshToken.token, jwt_secret, (err) => {
             if (err) return res.status(401).send('Invalid Token');
@@ -70,15 +74,18 @@ module.exports = {
         });
         console.log('userRefreshToken',userRefreshToken);
         if (!error) {
-            const accessToken = jsonwebtoken.sign({
+            const accessToken = jwt.sign({
                 userId: user.id,
                 userEmail: user.email
             }, jwt_secret, { expiresIn: '30m' });
 
-            const refreshToken = jsonwebtoken.sign({
+            const refreshToken = jwt.sign({
                 userId: user.id,
             }, jwt_secret, { expiresIn: '1d' });
 
+            await userRefreshToken.update({
+                token: refreshToken
+            });
             return res.status(200).send({
                 accessToken,
                 refreshToken

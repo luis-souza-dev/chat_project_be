@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.belongsToMany(models.Group, { through: 'UsersGroups' });
-      User.hasOne(models.RefreshToken);
+      User.belongsTo(models.RefreshToken);
     }
   }
 

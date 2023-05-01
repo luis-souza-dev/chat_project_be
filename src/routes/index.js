@@ -7,7 +7,7 @@ const { verifyJwt } = require('./middlewares/auth-middleware');
 
 const router = express.Router();
 
-router.use('/user', userRouter);
+router.use('/user', verifyJwt, userRouter);
 router.use('/group', verifyJwt, groupRouter);
 router.use('/message', verifyJwt, messageRouter);
 router.use('/auth', authRouter);
