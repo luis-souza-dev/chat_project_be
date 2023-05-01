@@ -22,8 +22,6 @@ module.exports = {
 
         if (!isValid) 
             return res.status(500).send('Invalid Password');
-        console.log('a', jwt_secret);
-        console.log('b', process.env.JWT_SECRET);
         let accessToken = jwt.sign({
             userId: user.id,
             userEmail: user.email
@@ -49,7 +47,6 @@ module.exports = {
     },
 
     refresh: async (req, res) => {
-        console.log('a', req.body);
         if(!req.body.token) return res.status(500).send('Missing token');
         const token = jwt.verify(req.body.token, jwt_secret,   function (err, payload) {
             if (err) return false;
@@ -61,7 +58,6 @@ module.exports = {
                 id: token.userId,
             }
         });
-        console.log('a, user', user)
         if (!user) return res.status(500).send('User not found');
         
         const userRefreshToken = await user.getRefreshToken();
@@ -71,7 +67,6 @@ module.exports = {
             if (err) return res.status(401).send('Invalid Token');
             else return null
         });
-        console.log('userRefreshToken',userRefreshToken);
         if (!error) {
             const accessToken = jwt.sign({
                 userId: user.id,
